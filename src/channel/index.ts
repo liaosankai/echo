@@ -6,3 +6,6 @@ export * from './pusher-presence-channel';
 export * from './socketio-channel';
 export * from './socketio-private-channel';
 export * from './socketio-presence-channel';
+export * from './radio-channel';
+export * from './radio-private-channel';
+export * from './radio-presence-channel';

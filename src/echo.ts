@@ -1,6 +1,6 @@
-import { EventFormatter } from './util';
-import { Channel, PresenceChannel } from './channel'
-import { PusherConnector, SocketIoConnector } from './connector';
+import {Channel, PresenceChannel} from './channel'
+import {PusherConnector, SocketIoConnector} from './connector';
+import {RadioConnector} from "./connector/radio-connector";
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -17,7 +17,7 @@ class Echo {
     /**
      * The Echo options.
      *
-     * @type {array}
+     * @type {Array}
      */
     options: any;
 
@@ -45,6 +45,8 @@ class Echo {
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
+        } else if (this.options.broadcaster == 'radio') {
+            this.connector = new RadioConnector(this.options);
         }
     }
 
