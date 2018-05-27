@@ -109,11 +109,11 @@ export class RadioConnector extends Connector {
         // Send any queued events
         let socket = this.socket;
 
-        socket['queue'].forEach(function (packet) {
-            packet = JSON.parse(packet);
-            packet['message']['socket_id'] = socket.id;
-            socket.send(JSON.stringify(packet));
-        });
+        // socket['queue'].forEach(function (packet) {
+        //     packet = JSON.parse(packet);
+        //     packet['message']['socket_id'] = socket.id;
+        //     socket.send(JSON.stringify(packet));
+        // });
 
         // Reset the queue
         this.socket.queue = [];
@@ -135,13 +135,6 @@ export class RadioConnector extends Connector {
 
         if (packet.event === 'connection') {
             connector.socket.id = packet['client_id'];
-            // axios.post(this.options.authEndpoint, {
-            //     client_id: packet.client_id
-            // }).then(function (response) {
-            //     connector.connection(response)
-            // }).catch(function (error) {
-            //     connector.disconnect();
-            // })
             connector.connection()
         } else if (packet.event === 'subscribe') {
 
@@ -155,12 +148,12 @@ export class RadioConnector extends Connector {
     /**
      * Listen for an event on a channel instance.
      *
-     * @param  {string} name
-     * @param  {string} event
-     * @param  {Function} callback
-     * @return {RadioChannel}
+     * @param {string} name
+     * @param {string} event
+     * @param {Function} callback
+     * @return {Channel}
      */
-    listen(name: string, event: string, callback: Function): RadioChannel {
+    listen(name: string, event: string, callback: Function) {
         return this.channel(name).listen(event, callback);
     }
 
@@ -168,16 +161,16 @@ export class RadioConnector extends Connector {
      * Get a channel instance by name.
      *
      * @param  {string} name
-     * @promise {RadioChannel}
+     * @promise {Promise<RadioChannel>}
      */
-    channel(name: string): RadioChannel {
+    channel(name: string): any {
         let self = this;
         let socket = this.socket;
         let options = this.options;
         let channels = this.channels;
         let eventEmitter = this.eventEmitter;
 
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             if (self.socketId()) {
                 if (!channels[name]) {
                     channels[name] = new RadioChannel(
@@ -186,7 +179,11 @@ export class RadioConnector extends Connector {
                         options
                     );
                 }
-                resolve(channels[name])
+                channels[name].then(function (response) {
+                    resolve(channels[name])
+                }).catch(function (response) {
+                    reject(response)
+                });
             } else {
                 eventEmitter.on('connection', function () {
                     channels[name] = new RadioChannel(
@@ -194,7 +191,11 @@ export class RadioConnector extends Connector {
                         name,
                         options
                     );
-                    resolve(channels[name])
+                    channels[name].then(function (response) {
+                        resolve(channels[name])
+                    }).catch(function (response) {
+                        reject(response)
+                    });
                 })
             }
         });
@@ -203,17 +204,17 @@ export class RadioConnector extends Connector {
     /**
      * Get a private channel instance by name.
      *
-     * @param  {string} name
-     * @promise {RadioPrivateChannel}
+     * @param {string} name
+     * @return {Promise<RadioPrivateChannel>}
      */
-    privateChannel(name: string): RadioPrivateChannel {
+    privateChannel(name: string): any {
         let self = this;
         let socket = this.socket;
         let options = this.options;
         let channels = this.channels;
         let eventEmitter = this.eventEmitter;
 
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             if (self.socketId()) {
                 if (!channels['private-' + name]) {
                     channels['private-' + name] = new RadioChannel(
@@ -222,7 +223,11 @@ export class RadioConnector extends Connector {
                         options
                     );
                 }
-                resolve(channels['private-' + name])
+                channels['private-' + name].then(function (response) {
+                    resolve(channels['private-' + name])
+                }).catch(function (response) {
+                    reject(response)
+                });
             } else {
                 eventEmitter.on('connection', function () {
                     channels['private-' + name] = new RadioChannel(
@@ -230,7 +235,11 @@ export class RadioConnector extends Connector {
                         'private-' + name,
                         options
                     );
-                    resolve(channels['private-' + name])
+                    channels['private-' + name].then(function (response) {
+                        resolve(channels['private-' + name])
+                    }).catch(function (response) {
+                        reject(response)
+                    });
                 })
             }
         });
@@ -239,17 +248,17 @@ export class RadioConnector extends Connector {
     /**
      * Get a presence channel instance by name.
      *
-     * @param  {string} name
-     * @promise {RadioPresenceChannel}
+     * @param {string} name
+     * @return {Promise<RadioPresenceChannel>}
      */
-    presenceChannel(name: string): RadioPresenceChannel {
+    presenceChannel(name: string): any {
         let self = this;
         let socket = this.socket;
         let options = this.options;
         let channels = this.channels;
         let eventEmitter = this.eventEmitter;
 
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             if (self.socketId()) {
                 if (!channels['presence-' + name]) {
                     channels['presence-' + name] = new RadioChannel(
@@ -258,7 +267,11 @@ export class RadioConnector extends Connector {
                         options
                     );
                 }
-                resolve(channels['presence-' + name])
+                channels['presence-' + name].then(function (response) {
+                    resolve(channels[name])
+                }).catch(function (response) {
+                    reject(response)
+                });
             } else {
                 eventEmitter.on('connection', function () {
                     channels['presence-' + name] = new RadioChannel(
@@ -266,7 +279,11 @@ export class RadioConnector extends Connector {
                         'presence-' + name,
                         options
                     );
-                    resolve(channels['presence-' + name])
+                    channels['presence-' + name].then(function (response) {
+                        resolve(channels[name])
+                    }).catch(function (response) {
+                        reject(response)
+                    });
                 })
             }
         });

@@ -56,9 +56,10 @@ export class RadioChannel extends Channel {
         this.options = options;
         this.eventFormatter = new EventFormatter(this.options.namespace);
 
-        this.subscribe();
-
         this.configureReconnector();
+
+        return this.subscribe();
+
     }
 
     /**
@@ -69,19 +70,12 @@ export class RadioChannel extends Channel {
     subscribe(): any {
         let channel = this;
 
-        axios.post(this.options.authEndpoint, {
+        return axios.post(this.options.authEndpoint, {
             action: 'subscribe',
             channel_name: channel.name
-        }).then(function (response) {
-
-        }).catch(function (error) {
-
-        });
-        //
-        // this.socket.emit('subscribe', {
-        //     channel: this.name,
-        //     auth: this.options.auth || {}
-        // });
+        }).then(function(){
+            return channel;
+        })
     }
 
     /**
@@ -94,14 +88,11 @@ export class RadioChannel extends Channel {
 
         axios.post(this.options.authEndpoint, {
             action: 'unsubscribe',
-            channel_name: channel.name,
-            client_id: channel.socket.id,
-            auth: channel.options.auth || {}
+            channel_name: channel.name
         }).then(function (response) {
             channel.unbind();
-        }).catch(function (error) {
-
-        });
+            return channel;
+        })
     }
 
     /**
